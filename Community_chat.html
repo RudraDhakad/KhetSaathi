@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KhetSaathi Community Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #2B9348;
+      --primary-dark: #207436;
+      --bg-light: #f5f5f5;
+      --bg-dark: #1c1c1c;
+      --text-light: #fff;
+      --text-dark: #222;
+      --chat-sent: #e2f4d7;
+      --chat-receive: #f0f0f0;
+      --chat-sent-dark: #4a6f3c;
+      --chat-receive-dark: #303030;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+    header {
+      background: var(--primary);
+      color: var(--text-light);
+      padding: 14px 20px;
+      font-weight: 600;
+      font-size: 1.3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    header button {
+      background: none;
+      border: 2px solid var(--text-light);
+      color: var(--text-light);
+      padding: 6px 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    header button:hover,
+    header button:focus-visible {
+      background: var(--text-light);
+      color: var(--primary);
+      outline: none;
+    }
+    main {
+      flex: 1 1 auto;
+      display: flex;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+    }
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--primary);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .user-list {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      padding: 8px 6px;
+      border-radius: 8px;
+      transition: background-color 0.15s;
+    }
+    .user:hover,
+    .user:focus-visible {
+      background-color: rgba(0, 0, 0, 0.15);
+      outline: none;
+    }
+    .user img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--text-light);
+    }
+    .user span {
+      font-weight: 500;
+    }
+    /* Chat container */
+    .chat-container {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-light);
+      transition: background 0.3s;
+      position: relative;
+    }
+    body.dark-mode .chat-container {
+      background: #272727;
+    }
+    /* Messages log */
+    .messages {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    /* Message bubble */
+    .message {
+      max-width: 60%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.3;
+      position: relative;
+      word-wrap: break-word;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+      user-select: text;
+      outline-offset: 3px;
+    }
+    /* Sent message */
+    .sent {
+      background: var(--chat-sent);
+      border-bottom-right-radius: 2px;
+      margin-left: auto;
+    }
+    body.dark-mode .sent {
+      background: var(--chat-sent-dark);
+      color: var(--text-light);
+    }
+    /* Received message */
+    .received {
+      background: var(--chat-receive);
+      border-bottom-left-radius: 2px;
+      margin-right: auto;
+    }
+    body.dark-mode .received {
+      background: var(--chat-receive-dark);
+      color: var(--text-light);
+    }
+    /* Message info */
+    .info {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+      user-select: none;
+    }
+    body.dark-mode .info {
+      color: #aaa;
+    }
+    /* Avatars for messages */
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .message-row.sent {
+      justify-content: flex-end;
+    }
+    .message-row .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      user-select: none;
+      flex-shrink: 0;
+      border: 1.5px solid transparent;
+    }
+    .message-row.sent .avatar {
+      order: 2;
+      border-color: var(--primary);
+    }
+    /* Input area */
+    .chat-input-area {
+      padding: 12px 20px;
+      border-top: 1px solid #ccc;
+      background: #fff;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    body.dark-mode .chat-input-area {
+      background: #1f1f1f;
+      border-color: #444;
+    }
+    .chat-input-area textarea {
+      flex: 1 1 auto;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 16px;
+      border: 1px solid #ccc;
+      resize: none;
+      min-height: 42px;
+      max-height: 120px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s;
+    }
+    body.dark-mode .chat-input-area textarea {
+      background: #272727;
+      color: var(--text-light);
+      border-color: #555;
+    }
+    .chat-input-area textarea:focus-visible {
+      outline: 2px solid var(--primary);
+      border-color: var(--primary);
+    }
+    .chat-input-area button {
+      background: var(--primary);
+      border: none;
+      padding: 10px 18px;
+      border-radius: 20px;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.25s;
+      user-select: none;
+      min-width: 52px;
+      min-height: 42px;
+    }
+    .chat-input-area button:hover,
+    .chat-input-area button:focus-visible {
+      background: var(--primary-dark);
+      outline: none;
+    }
+    /* Scrollbar for messages */
+    .messages::-webkit-scrollbar {
+      width: 8px;
+    }
+    .messages::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    /* Responsive */
+    @media (max-width: 700px) {
+      main {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: 120px;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 8px 12px;
+        gap: 16px;
+      }
+      .user-list {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding: 0;
+      }
+      .user {
+        flex-direction: column;
+        cursor: pointer;
+        margin-bottom: 0;
+        min-width: 60px;
+        text-align: center;
+      }
+      .user img {
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 6px;
+      }
+      .chat-container {
+        height: calc(100vh - 176px);
+      }
+      .chat-input-area {
+        padding: 9px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    KhetSaathi Community Chat
+    <button id="darkModeToggle" aria-pressed="false" aria-label="Toggle dark mode">🌙 Dark Mode</button>
+    <a href="Dashboard.html">Home</a>
+  </header>
+
+  <main>
+    <aside class="sidebar" aria-label="User list">
+      <h2>Community Users</h2>
+      <div class="user-list" role="list" tabindex="0">
+        <div class="user" role="listitem" tabindex="0" aria-label="User: Farmer Ram">
+          <img src="https://randomuser.me/api/portraits/men/31.jpg" alt="Farmer Ram profile" />
+          <span>Farmer Ram</span>
+        </div>
+        <div class="user" role="listitem" tabindex="0" aria-label="User: Farmer Anita">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Farmer Anita profile" />
+          <span>Farmer Anita</span>
+        </div>
+        <div class="user" role="listitem" tabindex="0" aria-label="User: Farmer Joshi">
+          <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Farmer Joshi profile" />
+          <span>Farmer Joshi</span>
+        </div>
+        <div class="user" role="listitem" tabindex="0" aria-label="User: Farmer Meena">
+          <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Farmer Meena profile" />
+          <span>Farmer Meena</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="chat-container" aria-label="Chat messages and input area">
+      <div class="messages" role="log" aria-live="polite" aria-relevant="additions" tabindex="0" id="messages">
+        <!-- Example messages -->
+        <div class="message-row received" tabindex="-1">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Farmer Anita" class="avatar" />
+          <div class="message received" aria-label="Message from Farmer Anita">
+            Hello! How's the wheat crop this season?
+            <div class="info">Anita &#8226; 10:10 AM</div>
+          </div>
+        </div>
+        <div class="message-row sent" tabindex="-1">
+          <div class="message sent" aria-label="Message from You">
+            Good, Anita! The rains this year helped a lot.
+            <div class="info">You &#8226; 10:12 AM</div>
+          </div>
+          <img src="https://randomuser.me/api/portraits/men/31.jpg" alt="You" class="avatar" />
+        </div>
+      </div>
+      <form class="chat-input-area" id="chatForm" aria-label="Send a message">
+        <textarea id="chatInput" rows="1" aria-label="Type your message here" placeholder="Type a message…" required></textarea>
+        <button type="submit" aria-label="Send message">➤</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      darkModeToggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+      darkModeToggle.setAttribute('aria-pressed', isDark);
+    });
+
+    // Scroll messages to bottom helper
+    function scrollToBottom() {
+      const messages = document.getElementById('messages');
+      messages.scrollTop = messages.scrollHeight;
+    }
+    scrollToBottom();
+
+    // Chat functionality: add message on send
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const messagesContainer = document.getElementById('messages');
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const messageText = chatInput.value.trim();
+      if (!messageText) return;
+      addMessage(messageText, 'sent', 'You', 'https://randomuser.me/api/portraits/men/31.jpg');
+      chatInput.value = '';
+      chatInput.focus();
+      simulateReply(); // Simulate reply for demo
+    });
+
+    // Adds message bubble
+    function addMessage(text, type, senderName, avatarUrl) {
+      const messageRow = document.createElement('div');
+      messageRow.className = `message-row ${type}`;
+      messageRow.tabIndex = -1;
+
+      // Avatar for sender or receiver
+      const avatar = document.createElement('img');
+      avatar.className = 'avatar';
+      avatar.src = avatarUrl;
+      avatar.alt = senderName;
+
+      const messageBubble = document.createElement('div');
+      messageBubble.className = `message ${type}`;
+      messageBubble.setAttribute('aria-label', `Message from ${senderName}`);
+      messageBubble.textContent = text;
+
+      const info = document.createElement('div');
+      info.className = 'info';
+      const timestamp = new Date();
+      const timeStr = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      info.innerHTML = `${senderName} &#8226; ${timeStr}`;
+
+      messageBubble.appendChild(info);
+
+      if (type === 'sent') {
+        messageRow.appendChild(messageBubble);
+        messageRow.appendChild(avatar);
+      } else {
+        messageRow.appendChild(avatar);
+        messageRow.appendChild(messageBubble);
+      }
+
+      messagesContainer.appendChild(messageRow);
+      scrollToBottom();
+    }
+
+    // Simulated reply (demo only)
+    function simulateReply() {
+      setTimeout(() => {
+        const replies = [
+          "Sounds great!",
+          "That's excellent news.",
+          "How's the weather affecting your crops?",
+          "Make sure to check for pests regularly.",
+          "Do you need help with fertilizers?"
+        ];
+        const replyText = replies[Math.floor(Math.random() * replies.length)];
+        addMessage(replyText, 'received', 'Farmer Anita', 'https://randomuser.me/api/portraits/women/44.jpg');
+      }, 1800);
+    }
+  </script>
+</body>
+</html>

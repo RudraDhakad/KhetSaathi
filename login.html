@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KhetSaathi Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background: url("bg.png") no-repeat center center/cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      width: 380px;
+      box-shadow: 0px 6px 24px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    .logo {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #2B9348;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 28px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .login-card h2 {
+      font-weight: 700;
+      font-size: 22px;
+      margin-top: 12px;
+      color: #1a1a1a;
+    }
+    .login-card p {
+      font-size: 14px;
+      color: #555;
+      margin: 6px 0 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2B9348;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #23763a;
+    }
+    .register {
+      margin-top: 16px;
+      font-size: 14px;
+    }
+    .register a {
+      color: #2B9348;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .demo {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #777;
+    }
+    #otpSection {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo">🌾</div>
+    <h1>KhetSaathi</h1>
+    <p>Your Smart Farming Assistant</p>
+
+    <h2>🔒 Secure Login</h2>
+    <p>Enter your Aadhaar details to access your farming dashboard</p>
+
+    <input type="text" id="aadhaar" placeholder="Enter 12-digit Aadhaar Number" maxlength="12">
+    <button onclick="getOTP()">Get OTP</button>
+
+    <div id="otpSection">
+      <input type="text" id="otp" placeholder="Enter OTP" maxlength="6">
+      <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <div class="register">
+      Don't have an account? <br>
+      <a href="Registration.html">Register as New Farmer</a>
+    </div>
+
+    <div class="demo">Demo Aadhaar: 12 digits | Demo OTP: 123456</div>
+  </div>
+
+  <script>
+    function getOTP() {
+      let aadhaar = document.getElementById("aadhaar").value;
+      if (aadhaar.length !== 12 || isNaN(aadhaar)) {
+        alert("Please enter a valid 12-digit Aadhaar number.");
+        return;
+      }
+      alert("OTP sent successfully! (Demo OTP: 123456)");
+      document.getElementById("otpSection").style.display = "block";
+    }
+
+    function verifyOTP() {
+      let otp = document.getElementById("otp").value;
+      if (otp === "123456") {
+        alert("Login Successful ✅ Redirecting to Dashboard...");
+        window.location.href = "Dashboard.html"; // mock redirect
+      } else {
+        alert("Invalid OTP ❌ Please try again.");
+      }
+    }
+  </script>
+</body>
+</html>
